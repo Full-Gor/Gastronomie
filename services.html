@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - Délices & Saveurs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links-services {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links-services li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links-services li a:hover {
+            color: #ff9500;
+        }
+
+        .nav-links-services li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff9500;
+            transition: width 0.3s;
+        }
+
+        .nav-links-services li a:hover::after {
+            width: 100%;
+        }
+
+        .burger-services {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .burger-services span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        .burger-services.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .burger-services.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-services.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Gallery Container */
+        .gallery-container {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+
+        .gallery-header {
+            text-align: center;
+            padding: 3rem 5%;
+            margin-bottom: 2rem;
+        }
+
+        .gallery-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ff9500, #ff6b00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gallery-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .parallax-wrapper {
+            position: relative;
+            height: 135%;
+        }
+
+        .gallery-track {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            will-change: transform;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 2rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-card {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .gallery-card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            will-change: transform;
+        }
+
+        .gallery-card:hover .gallery-card-image {
+            transform: scale(1.1);
+        }
+
+        .gallery-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 2rem 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-card:hover .gallery-card-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-card-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #ff9500;
+        }
+
+        .gallery-card-description {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .burger-services {
+                display: flex;
+            }
+
+            .nav-links-services {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 250px;
+                height: calc(100vh - 70px);
+                background: rgba(10, 10, 10, 0.98);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: right 0.3s ease;
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links-services.active {
+                right: 0;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .gallery-header h1 {
+                font-size: 2rem;
+            }
+
+            .gallery-header p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-nav {
+                padding: 1rem 5%;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .gallery-header {
+                padding: 2rem 5%;
+            }
+
+            .gallery {
+                padding: 1rem 5%;
+            }
+
+            .gallery-card-title {
+                font-size: 1.1rem;
+            }
+
+            .gallery-card-description {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav" id="topNav">
+        <a href="index.html" class="logo">DÉLICES & SAVEURS</a>
+        <ul class="nav-links-services" id="navLinksServices">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="menu.html">Notre Menu</a></li>
+            <li><a href="apropos.html">À Propos</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="burger-services" id="burgerServices">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="gallery-container">
+        <div class="gallery-header">
+            <h1>Nos Services</h1>
+            <p>Découvrez nos différentes formules pour profiter de notre cuisine gastronomique</p>
+        </div>
+
+        <div class="parallax-wrapper">
+            <div class="gallery-track" id="galleryTrack">
+                <div class="gallery" id="gallery">
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80" alt="Dîner Gastronomique" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Dîner Gastronomique</div>
+                                <div class="gallery-card-description">Savourez une expérience culinaire raffinée avec notre menu dégustation en 5 ou 7 services.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80" alt="Déjeuner d'Affaires" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Déjeuner d'Affaires</div>
+                                <div class="gallery-card-description">Un cadre élégant et discret pour vos repas professionnels avec menu adapté.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=800&q=80" alt="Brunch Dominical" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Brunch Dominical</div>
+                                <div class="gallery-card-description">Tous les dimanches, profitez de notre buffet brunch avec produits frais et pâtisseries maison.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80" alt="Événements Privés" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Événements Privés</div>
+                                <div class="gallery-card-description">Célébrez vos moments spéciaux dans notre salon privatif jusqu'à 50 convives.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80" alt="Service Traiteur" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Service Traiteur</div>
+                                <div class="gallery-card-description">Notre chef se déplace pour vos événements avec un service traiteur haut de gamme.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80" alt="Réservations Groupes" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Réservations Groupes</div>
+                                <div class="gallery-card-description">Accueillez vos groupes dans un cadre raffiné avec menus personnalisés.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80" alt="Menu Enfant" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Menu Enfant</div>
+                                <div class="gallery-card-description">Des plats spécialement élaborés pour les jeunes gastronomes avec des saveurs adaptées.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1547573854-74d2a71d0826?w=800&q=80" alt="Menu Végétarien" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Menu Végétarien</div>
+                                <div class="gallery-card-description">Une carte végétarienne créative mettant en valeur légumes de saison et saveurs délicates.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80" alt="Boissons Non Alcoolisées" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Boissons Non Alcoolisées</div>
+                                <div class="gallery-card-description">Large sélection de jus frais, smoothies et mocktails créatifs pour accompagner vos repas.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Café & Thés" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Café & Thés</div>
+                                <div class="gallery-card-description">Sélection de cafés d'exception et thés du monde entier pour parfaire votre expérience.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&q=80" alt="Tables en Terrasse" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Tables en Terrasse</div>
+                                <div class="gallery-card-description">Profitez de notre terrasse ombragée aux beaux jours pour un moment de détente.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=800&q=80" alt="Service à Table" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Service à Table</div>
+                                <div class="gallery-card-description">Notre équipe attentive assure un service impeccable pour une expérience mémorable.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=800&q=80" alt="Desserts Signature" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Desserts Signature</div>
+                                <div class="gallery-card-description">Découvrez nos créations sucrées élaborées par notre chef pâtissier talentueux.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=800&q=80" alt="Menu du Chef" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Menu du Chef</div>
+                                <div class="gallery-card-description">Menu surprise renouvelé chaque semaine selon l'inspiration du chef et produits du marché.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80" alt="Formule Découverte" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Formule Découverte</div>
+                                <div class="gallery-card-description">Entrée, plat et dessert pour découvrir notre cuisine à un tarif accessible.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80" alt="Cuisine du Monde" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Cuisine du Monde</div>
+                                <div class="gallery-card-description">Voyagez à travers nos plats inspirés des cuisines méditerranéenne et asiatique.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=800&q=80" alt="Produits de Saison" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Produits de Saison</div>
+                                <div class="gallery-card-description">Notre carte évolue au rythme des saisons pour vous offrir le meilleur des produits frais.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&q=80" alt="Ambiance Feutrée" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Ambiance Feutrée</div>
+                                <div class="gallery-card-description">Un décor soigné et une atmosphère chaleureuse pour vos moments de détente.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80" alt="Réservation en Ligne" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Réservation en Ligne</div>
+                                <div class="gallery-card-description">Réservez votre table facilement via notre système de réservation en ligne 24h/24.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=80" alt="Menus Allergènes" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Menus Allergènes</div>
+                                <div class="gallery-card-description">Notre équipe s'adapte à vos restrictions alimentaires pour garantir votre sécurité.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800&q=80" alt="Fruits Frais" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Fruits Frais</div>
+                                <div class="gallery-card-description">Jus de fruits pressés minute et cocktails de fruits pour une fraîcheur garantie.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=800&q=80" alt="Plats à Emporter" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Plats à Emporter</div>
+                                <div class="gallery-card-description">Emportez nos créations gastronomiques chez vous avec notre service de vente à emporter.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80" alt="Cuisine Ouverte" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Cuisine Ouverte</div>
+                                <div class="gallery-card-description">Observez nos chefs en action depuis notre cuisine ouverte sur la salle.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-card">
+                        <div class="gallery-card-inner">
+                            <img src="https://images.unsplash.com/photo-1564759224907-65b945ff0e8f?w=800&q=80" alt="Accueil Chaleureux" class="gallery-card-image">
+                            <div class="gallery-card-overlay">
+                                <div class="gallery-card-title">Accueil Chaleureux</div>
+                                <div class="gallery-card-description">Notre équipe vous accueille avec le sourire pour faire de votre visite un moment unique.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Burger Menu Toggle
+        const burger = document.getElementById('burgerServices');
+        const navLinks = document.getElementById('navLinksServices');
+
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when clicking on a link
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Smooth Scroll & Parallax Effect
+        class SmoothScroll {
+            constructor() {
+                this.scrollY = 0;
+                this.currentY = 0;
+                this.ease = 0.1;
+                this.gallery = document.getElementById('gallery');
+                this.galleryTrack = document.getElementById('galleryTrack');
+                this.cards = document.querySelectorAll('.gallery-card-image');
+
+                this.init();
+            }
+
+            init() {
+                this.setHeight();
+                this.render();
+                window.addEventListener('resize', () => this.setHeight());
+            }
+
+            setHeight() {
+                document.body.style.height = `${this.galleryTrack.offsetHeight}px`;
+            }
+
+            lerp(start, end, factor) {
+                return start + (end - start) * factor;
+            }
+
+            render() {
+                this.scrollY = window.scrollY;
+                this.currentY = this.lerp(this.currentY, this.scrollY, this.ease);
+
+                // Apply smooth scroll to gallery track
+                this.galleryTrack.style.transform = `translateY(-${this.currentY}px)`;
+
+                // Parallax effect on images
+                const scrollProgress = this.currentY / (document.body.offsetHeight - window.innerHeight);
+                this.cards.forEach((card, index) => {
+                    const speed = (index % 3 + 1) * 0.5;
+                    const offset = this.currentY * speed * 0.15;
+                    card.style.transform = `translateY(${offset}px) scale(1.1)`;
+                });
+
+                requestAnimationFrame(() => this.render());
+            }
+        }
+
+        // Initialize smooth scroll
+        new SmoothScroll();
+
+        // Card hover effects
+        const cards = document.querySelectorAll('.gallery-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

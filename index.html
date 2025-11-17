@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Gastronomique - Délices & Saveurs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 30px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0);
+        }
+
+        nav.scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px 60px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Menu Burger */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1001;
+            width: 30px;
+            height: 24px;
+            position: relative;
+        }
+
+        .burger-menu span {
+            width: 100%;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+        }
+
+        .burger-menu span:nth-child(1) {
+            top: 0;
+        }
+
+        .burger-menu span:nth-child(2) {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .burger-menu span:nth-child(3) {
+            bottom: 0;
+        }
+
+        .burger-menu.active span:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .burger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-menu.active span:nth-child(3) {
+            bottom: 50%;
+            transform: translateY(50%) rotate(-45deg);
+        }
+
+        /* Section de base */
+        section {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Hero Section - Parallax Vertical */
+        #hero {
+            height: 120vh;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: -20%;
+            left: 0;
+            width: 100%;
+            height: 140%;
+            background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2000');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(50px, 8vw, 120px);
+            font-weight: 200;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero-content p {
+            font-size: clamp(16px, 2vw, 24px);
+            font-weight: 300;
+            letter-spacing: 3px;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        /* Menu Section - Parallax Horizontal */
+        #menu {
+            background: #0a0a0a;
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(40px, 6vw, 80px);
+            font-weight: 200;
+            letter-spacing: 5px;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .section-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .horizontal-scroll-wrapper {
+            display: flex;
+            gap: 40px;
+            padding: 0 60px;
+            will-change: transform;
+            transition: transform 0.3s ease-out;
+        }
+
+        .menu-card {
+            min-width: 600px;
+            height: 400px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+
+        .menu-card:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .menu-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .menu-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+
+        .menu-overlay h3 {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .menu-overlay p {
+            font-size: 14px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* About Section - Parallax en Profondeur (Zoom) */
+        #about {
+            position: relative;
+            height: 100vh;
+        }
+
+        .depth-parallax-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.5);
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?q=80&w=2560&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+            filter: brightness(1.2);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .about-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .about-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-content h2 {
+            font-size: 48px;
+            font-weight: 200;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+        }
+
+        .about-content p {
+            font-size: 18px;
+            line-height: 1.8;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Drinks Section */
+        #drinks {
+            position: relative;
+            min-height: 100vh;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .drinks-bg {
+            position: absolute;
+            top: -20%;
+            left: 0;
+            width: 100%;
+            height: 140%;
+            background-image: url('https://images.unsplash.com/photo-1544145945-f90425340c7e?q=80&w=2560&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+            will-change: transform;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: brightness(1.3);
+        }
+
+        .drinks-content {
+            position: relative;
+            z-index: 10;
+            padding: 100px 60px;
+        }
+
+        .drinks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .drink-item {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .drink-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .drink-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-10px);
+        }
+
+        .drink-item h3 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .drink-item p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        /* Contact Section */
+        #contact {
+            position: relative;
+            min-height: 100vh;
+            padding: 100px 60px;
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=2560&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: brightness(1.2);
+            transform: scale(1.2);
+            opacity: 0.6;
+        }
+
+        .contact-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+            z-index: 1;
+        }
+
+        .contact-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 60px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 800px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .contact-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .contact-info {
+            margin-top: 60px;
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        .contact-info a {
+            color: #fff;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .contact-info a:hover {
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            height: 60vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2560&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .footer-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .footer-content p {
+            font-size: 16px;
+            letter-spacing: 3px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .footer-content .copyright {
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            nav {
+                padding: 20px 40px;
+            }
+
+            nav.scrolled {
+                padding: 20px 40px;
+            }
+
+            .burger-menu {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                max-width: 400px;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: right 0.4s ease;
+                padding: 60px 40px;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 18px;
+                letter-spacing: 3px;
+            }
+
+            .hero-content h1 {
+                font-size: clamp(40px, 10vw, 80px);
+            }
+
+            .section-title {
+                font-size: clamp(30px, 8vw, 60px);
+                margin-bottom: 60px;
+            }
+
+            .menu-card {
+                min-width: 70vw;
+                height: 350px;
+            }
+
+            .about-content {
+                max-width: 600px;
+                padding: 30px;
+            }
+
+            .drinks-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+
+            .contact-content {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+
+            nav {
+                padding: 15px 20px;
+            }
+
+            nav.scrolled {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+
+            .nav-links {
+                width: 80%;
+                max-width: none;
+                gap: 30px;
+                padding: 40px 30px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+
+            .hero-content h1 {
+                font-size: clamp(35px, 12vw, 60px);
+                letter-spacing: 5px;
+            }
+
+            .hero-content p {
+                font-size: clamp(14px, 4vw, 18px);
+                letter-spacing: 2px;
+            }
+
+            .section-title {
+                font-size: clamp(28px, 10vw, 50px);
+                letter-spacing: 3px;
+                margin-bottom: 40px;
+            }
+
+            #menu {
+                padding: 60px 0 80px;
+            }
+
+            .horizontal-scroll-wrapper {
+                padding: 0 20px;
+                gap: 20px;
+            }
+
+            .menu-card {
+                min-width: 85vw;
+                height: 280px;
+            }
+
+            .menu-overlay {
+                padding: 20px;
+            }
+
+            .menu-overlay h3 {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+
+            .menu-overlay p {
+                font-size: 13px;
+            }
+
+            .about-content {
+                max-width: 90%;
+                padding: 25px;
+                margin: 20px;
+            }
+
+            .about-content h2 {
+                font-size: 28px;
+                margin-bottom: 20px;
+                letter-spacing: 2px;
+            }
+
+            .about-content p {
+                font-size: 15px;
+                line-height: 1.7;
+            }
+
+            .drinks-content {
+                padding: 60px 20px 80px;
+            }
+
+            .drinks-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                margin-top: 40px;
+            }
+
+            .drink-item {
+                padding: 30px 25px;
+            }
+
+            .drink-item h3 {
+                font-size: 20px;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            .drink-item p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            #contact {
+                padding: 60px 20px;
+                min-height: 80vh;
+            }
+
+            .contact-content {
+                padding: 30px 25px;
+                max-width: 90%;
+            }
+
+            .contact-content h2 {
+                font-size: 28px;
+            }
+
+            .contact-info {
+                margin-top: 40px;
+                font-size: 15px;
+            }
+
+            footer {
+                height: 50vh;
+            }
+
+            .footer-content {
+                padding: 30px 20px;
+            }
+
+            .footer-content p {
+                font-size: 14px;
+                letter-spacing: 2px;
+            }
+
+            .footer-content .copyright {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+
+            .burger-menu {
+                width: 26px;
+                height: 20px;
+            }
+
+            .nav-links {
+                width: 85%;
+                gap: 25px;
+                padding: 30px 20px;
+            }
+
+            .nav-links a {
+                font-size: 15px;
+                letter-spacing: 2px;
+            }
+
+            .hero-content h1 {
+                font-size: clamp(28px, 12vw, 45px);
+                letter-spacing: 3px;
+            }
+
+            .hero-content p {
+                font-size: clamp(12px, 4vw, 16px);
+            }
+
+            .section-title {
+                font-size: clamp(24px, 10vw, 40px);
+                margin-bottom: 30px;
+            }
+
+            .menu-card {
+                min-width: 90vw;
+                height: 250px;
+            }
+
+            .about-content {
+                padding: 20px;
+            }
+
+            .about-content h2 {
+                font-size: 24px;
+                letter-spacing: 1px;
+            }
+
+            .about-content p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .drink-item {
+                padding: 25px 20px;
+            }
+
+            .drink-item h3 {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+
+            .drink-item p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .contact-content {
+                padding: 25px 20px;
+            }
+
+            .contact-content h2 {
+                font-size: 24px;
+            }
+
+            .contact-info {
+                font-size: 14px;
+                margin-top: 30px;
+            }
+
+            footer {
+                height: 40vh;
+                min-height: 300px;
+            }
+
+            /* Optimisation des parallax pour mobile */
+            .parallax-bg,
+            .depth-parallax-bg,
+            .drinks-bg,
+            .contact-bg,
+            .footer-bg {
+                will-change: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="logo">DÉLICES & SAVEURS</div>
+        <div class="burger-menu" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#hero">Accueil</a></li>
+            <li><a href="menu.html">Notre Menu</a></li>
+            <li><a href="apropos.html">À Propos</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section - Parallax Vertical -->
+    <section id="hero">
+        <div class="parallax-bg"></div>
+        <div class="hero-content">
+            <h1>GASTRONOMIE</h1>
+            <p>Une expérience culinaire d'exception</p>
+        </div>
+    </section>
+
+    <!-- Menu Section - Parallax Horizontal -->
+    <section id="menu">
+        <h2 class="section-title">Nos Spécialités</h2>
+        <div class="horizontal-scroll-wrapper">
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=800" alt="Plat Gastronomique">
+                <div class="menu-overlay">
+                    <h3>Cuisine Française</h3>
+                    <p>Des plats raffinés et authentiques</p>
+                </div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800" alt="Salade Fraîche">
+                <div class="menu-overlay">
+                    <h3>Entrées Fraîches</h3>
+                    <p>Saveurs délicates et légères</p>
+                </div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800" alt="Plat Principal">
+                <div class="menu-overlay">
+                    <h3>Plats Signature</h3>
+                    <p>Créations du chef</p>
+                </div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800" alt="Dessert">
+                <div class="menu-overlay">
+                    <h3>Desserts Maison</h3>
+                    <p>Douceurs artisanales</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section - Parallax en Profondeur -->
+    <section id="about">
+        <div class="depth-parallax-bg"></div>
+        <div class="about-content">
+            <h2>Notre Philosophie</h2>
+            <p>Nous croyons que la gastronomie est un art qui éveille les sens et crée des souvenirs inoubliables. Notre cuisine allie tradition et innovation pour vous offrir une expérience culinaire unique. Chaque plat est préparé avec des ingrédients frais et de saison, dans le respect des saveurs authentiques.</p>
+        </div>
+    </section>
+
+    <!-- Drinks Section -->
+    <section id="drinks">
+        <div class="drinks-bg"></div>
+        <div class="drinks-content">
+            <h2 class="section-title">Nos Boissons</h2>
+            <div class="drinks-grid">
+                <div class="drink-item">
+                    <h3>Jus Frais</h3>
+                    <p>Jus de fruits fraîchement pressés, pleins de vitamines et de saveurs naturelles.</p>
+                </div>
+                <div class="drink-item">
+                    <h3>Smoothies</h3>
+                    <p>Mélanges onctueux de fruits frais, parfaits pour une pause vitaminée et rafraîchissante.</p>
+                </div>
+                <div class="drink-item">
+                    <h3>Cafés d'Exception</h3>
+                    <p>Sélection de cafés premium torréfiés artisanalement pour une expérience gustative unique.</p>
+                </div>
+                <div class="drink-item">
+                    <h3>Thés du Monde</h3>
+                    <p>Collection exclusive de thés rares et infusions bio provenant des quatre coins du monde.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="contact-bg"></div>
+        <div class="contact-overlay"></div>
+        <div class="contact-content">
+            <h2 class="section-title">Réservations</h2>
+            <div class="contact-info">
+                <p>Email: <a href="mailto:contact@delices-saveurs.fr">contact@delices-saveurs.fr</a></p>
+                <p>Téléphone: <a href="tel:+33123456789">+33 1 23 45 67 89</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-bg"></div>
+        <div class="footer-overlay"></div>
+        <div class="footer-content">
+            <p>L'ART DE LA GASTRONOMIE</p>
+            <p class="copyright">© 2025 DÉLICES & SAVEURS. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Détection mobile pour optimisation des performances
+        const isMobile = window.innerWidth <= 768;
+        const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+
+        // Burger Menu Toggle
+        const burger = document.getElementById('burger');
+        const navLinks = document.getElementById('navLinks');
+
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // Fermer le menu quand on clique sur un lien
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // Fermer le menu si on clique en dehors
+        document.addEventListener('click', (e) => {
+            if (!navbar.contains(e.target) && navLinks.classList.contains('active')) {
+                burger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Navigation scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Parallax vertical pour Hero (réduit sur mobile)
+        const parallaxBg = document.querySelector('.parallax-bg');
+        window.addEventListener('scroll', () => {
+            if (!isMobile && parallaxBg) {
+                const scrolled = window.pageYOffset;
+                parallaxBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Parallax horizontal pour le menu (scroll + souris)
+        const horizontalWrapper = document.querySelector('.horizontal-scroll-wrapper');
+        const menuSection = document.getElementById('menu');
+        let mouseScrollOffset = 0;
+
+        // Contrôle au scroll
+        window.addEventListener('scroll', () => {
+            if (horizontalWrapper && menuSection) {
+                const rect = menuSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const maxScroll = horizontalWrapper.scrollWidth - window.innerWidth;
+                    const scrollOffset = progress * maxScroll;
+                    horizontalWrapper.style.transform = `translateX(-${scrollOffset + mouseScrollOffset}px)`;
+                }
+            }
+        });
+
+        // Contrôle à la souris (désactivé sur mobile)
+        if (menuSection && !isMobile) {
+            menuSection.addEventListener('mousemove', (e) => {
+                const rect = menuSection.getBoundingClientRect();
+                const mouseX = e.clientX;
+                const sectionWidth = rect.width;
+                const mouseProgress = mouseX / sectionWidth;
+
+                // Calculer le déplacement basé sur la position de la souris
+                const maxMouseScroll = 300; // Amplitude du mouvement
+                mouseScrollOffset = (mouseProgress - 0.5) * maxMouseScroll;
+
+                // Recalculer la position avec l'offset de la souris
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const maxScroll = horizontalWrapper.scrollWidth - window.innerWidth;
+                    const scrollOffset = progress * maxScroll;
+                    horizontalWrapper.style.transform = `translateX(-${scrollOffset + mouseScrollOffset}px)`;
+                }
+            });
+
+            // Réinitialiser quand la souris quitte
+            menuSection.addEventListener('mouseleave', () => {
+                mouseScrollOffset = 0;
+                const rect = menuSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const maxScroll = horizontalWrapper.scrollWidth - window.innerWidth;
+                    const scrollOffset = progress * maxScroll;
+                    horizontalWrapper.style.transform = `translateX(-${scrollOffset}px)`;
+                }
+            });
+        }
+
+        // Parallax en profondeur (zoom) pour About
+        const depthBg = document.querySelector('.depth-parallax-bg');
+        const aboutSection = document.getElementById('about');
+
+        window.addEventListener('scroll', () => {
+            if (depthBg && aboutSection) {
+                const rect = aboutSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = 1 - (sectionTop / window.innerHeight);
+                    const scale = 1.5 - (progress * 0.3);
+                    depthBg.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                }
+            }
+        });
+
+        // Parallax 3D en profondeur pour Drinks
+        const drinksBg = document.querySelector('.drinks-bg');
+        const drinksSection = document.getElementById('drinks');
+
+        window.addEventListener('scroll', () => {
+            if (drinksBg && drinksSection) {
+                const rect = drinksSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    // Effet parallax vertical avec zoom progressif
+                    const translateY = progress * 200 - 100;
+                    const scale = 1 + (progress * 0.2);
+                    drinksBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            }
+        });
+
+        // Parallax 3D avec mouvement de la souris pour Drinks (désactivé sur mobile)
+        if (drinksSection && drinksBg && !isMobile) {
+            drinksSection.addEventListener('mousemove', (e) => {
+                const rect = drinksSection.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = (e.clientY - rect.top) / rect.height;
+
+                // Calculer le déplacement 3D basé sur la position de la souris
+                const moveX = (mouseX - 0.5) * 50;
+                const moveY = (mouseY - 0.5) * 50;
+
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const translateY = progress * 200 - 100;
+                    const scale = 1 + (progress * 0.2);
+                    drinksBg.style.transform = `translateY(${translateY}px) translateX(${moveX}px) scale(${scale})`;
+                }
+            });
+
+            drinksSection.addEventListener('mouseleave', () => {
+                const rect = drinksSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const translateY = progress * 200 - 100;
+                    const scale = 1 + (progress * 0.2);
+                    drinksBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            });
+        }
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observer pour les titres et contenus
+        document.querySelectorAll('.section-title, .about-content, .drink-item, .contact-content').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Animation des drink items avec délai
+        const drinkItems = document.querySelectorAll('.drink-item');
+        drinkItems.forEach((item, index) => {
+            item.style.transitionDelay = `${index * 0.1}s`;
+        });
+
+        // Parallax 3D en profondeur pour Contact
+        const contactBg = document.querySelector('.contact-bg');
+        const contactSection = document.getElementById('contact');
+
+        window.addEventListener('scroll', () => {
+            if (contactBg && contactSection) {
+                const rect = contactSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    // Effet zoom progressif en profondeur
+                    const scale = 1.2 + (progress * 0.4);
+                    const translateY = (progress - 0.5) * 150;
+                    contactBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            }
+        });
+
+        // Parallax 3D avec mouvement de la souris pour Contact (désactivé sur mobile)
+        if (contactSection && contactBg && !isMobile) {
+            contactSection.addEventListener('mousemove', (e) => {
+                const rect = contactSection.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = (e.clientY - rect.top) / rect.height;
+
+                // Effet de profondeur 3D
+                const moveX = (mouseX - 0.5) * 80;
+                const moveY = (mouseY - 0.5) * 80;
+
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const scale = 1.2 + (progress * 0.4);
+                    const translateY = (progress - 0.5) * 150;
+                    contactBg.style.transform = `translateY(${translateY}px) translateX(${moveX}px) scale(${scale}) rotateX(${(mouseY - 0.5) * 3}deg) rotateY(${(mouseX - 0.5) * 3}deg)`;
+                }
+            });
+
+            contactSection.addEventListener('mouseleave', () => {
+                const rect = contactSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const scale = 1.2 + (progress * 0.4);
+                    const translateY = (progress - 0.5) * 150;
+                    contactBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            });
+        }
+
+        // Parallax 3D en profondeur pour Footer
+        const footerBg = document.querySelector('.footer-bg');
+        const footerSection = document.querySelector('footer');
+
+        window.addEventListener('scroll', () => {
+            if (footerBg && footerSection) {
+                const rect = footerSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    // Effet zoom progressif en profondeur
+                    const scale = 1 + (progress * 0.3);
+                    const translateY = progress * 100 - 50;
+                    footerBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            }
+        });
+
+        // Parallax 3D avec mouvement de la souris pour Footer (désactivé sur mobile)
+        if (footerSection && footerBg && !isMobile) {
+            footerSection.addEventListener('mousemove', (e) => {
+                const rect = footerSection.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = (e.clientY - rect.top) / rect.height;
+
+                // Effet de profondeur 3D
+                const moveX = (mouseX - 0.5) * 60;
+                const moveY = (mouseY - 0.5) * 40;
+
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const scale = 1 + (progress * 0.3);
+                    const translateY = progress * 100 - 50;
+                    footerBg.style.transform = `translateY(${translateY}px) translateX(${moveX}px) scale(${scale}) rotateX(${(mouseY - 0.5) * 2}deg) rotateY(${(mouseX - 0.5) * 2}deg)`;
+                }
+            });
+
+            footerSection.addEventListener('mouseleave', () => {
+                const rect = footerSection.getBoundingClientRect();
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height;
+
+                if (sectionTop < window.innerHeight && sectionTop > -sectionHeight) {
+                    const progress = (window.innerHeight - sectionTop) / (window.innerHeight + sectionHeight);
+                    const scale = 1 + (progress * 0.3);
+                    const translateY = progress * 100 - 50;
+                    footerBg.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                }
+            });
+        }
+
+        // Smooth scroll pour les liens de navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

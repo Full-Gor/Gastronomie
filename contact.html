@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Délices & Saveurs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            background: #111;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 30px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            z-index: 1001;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Menu Burger */
+        .burger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1001;
+            width: 30px;
+            height: 24px;
+            position: relative;
+        }
+
+        .burger-menu span {
+            width: 100%;
+            height: 2px;
+            background: #fff;
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+        }
+
+        .burger-menu span:nth-child(1) {
+            top: 0;
+        }
+
+        .burger-menu span:nth-child(2) {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .burger-menu span:nth-child(3) {
+            bottom: 0;
+        }
+
+        .burger-menu.active span:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .burger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .burger-menu.active span:nth-child(3) {
+            bottom: 50%;
+            transform: translateY(50%) rotate(-45deg);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            padding: 120px 20px 60px;
+        }
+
+        .container {
+            min-width: 700px;
+            min-height: 350px;
+            border-radius: 20px;
+            position: relative;
+            transition: 1.5s ease-in-out;
+            transform-style: preserve-3d;
+        }
+
+        .side {
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px 50px;
+            color: #fff;
+            font-weight: 700;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            border-radius: 20px;
+        }
+
+        .content {
+            transform: translateZ(70px) scale(0.8);
+            line-height: 1.5em;
+        }
+
+        .content h1 {
+            position: relative;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .content p {
+            margin-top: 50px;
+            line-height: 2em;
+            font-weight: 700;
+        }
+
+        .content h1:before {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            height: 3px;
+            background-color: #fff;
+            width: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .front {
+            z-index: 2;
+            background-size: cover;
+            background-position: center;
+            background-image: url(https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2000);
+        }
+
+        .back {
+            background-color: #333;
+            transform: rotateY(180deg);
+            z-index: 0;
+            padding-top: 10px;
+            background-image: url(https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2000);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container:hover {
+            transform: rotateY(180deg);
+        }
+
+        form {
+            text-align: left;
+        }
+
+        .back h1 {
+            margin: 0;
+        }
+
+        form label,
+        form input,
+        form textarea {
+            display: block;
+        }
+
+        form input,
+        form textarea {
+            background: transparent;
+            border: 0;
+            border-bottom: 2px solid #fff;
+            padding: 5px;
+            width: 100%;
+            color: #fff;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        form input:focus,
+        form textarea:focus {
+            outline: none;
+            border-bottom-color: #fff;
+        }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        form label {
+            margin: 15px 0 5px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        form input[type="submit"] {
+            display: block;
+            width: auto;
+            margin: 20px auto 10px;
+            padding: 8px 20px;
+            border: 3px solid #fff;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.35s ease-in-out;
+            background: transparent;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #fff;
+            border-color: #fff;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            padding: 30px 60px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        footer p {
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            nav {
+                padding: 20px 40px;
+            }
+
+            .burger-menu {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                max-width: 400px;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: right 0.4s ease;
+                padding: 60px 40px;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 18px;
+                letter-spacing: 3px;
+            }
+
+            .container {
+                min-width: 80vw;
+                min-height: 400px;
+            }
+
+            .content {
+                transform: translateZ(40px) scale(0.85);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+
+            .nav-links {
+                width: 80%;
+                gap: 30px;
+                padding: 40px 30px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+
+            main {
+                padding: 100px 15px 40px;
+            }
+
+            .container {
+                min-width: 95vw;
+                min-height: 450px;
+            }
+
+            .side {
+                padding: 20px 30px;
+            }
+
+            .content {
+                transform: translateZ(30px) scale(0.9);
+            }
+
+            .content h1 {
+                font-size: 24px;
+            }
+
+            .content p {
+                margin-top: 30px;
+                font-size: 14px;
+                line-height: 1.7em;
+            }
+
+            form label {
+                font-size: 13px;
+                margin: 12px 0 5px;
+            }
+
+            form input,
+            form textarea {
+                font-size: 14px;
+            }
+
+            footer {
+                padding: 25px 20px;
+            }
+
+            footer p {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 18px;
+            }
+
+            .burger-menu {
+                width: 26px;
+                height: 20px;
+            }
+
+            .nav-links {
+                width: 85%;
+                gap: 25px;
+                padding: 30px 20px;
+            }
+
+            .nav-links a {
+                font-size: 15px;
+            }
+
+            .container {
+                min-width: 98vw;
+                min-height: 500px;
+            }
+
+            .side {
+                padding: 15px 20px;
+            }
+
+            .content h1 {
+                font-size: 22px;
+            }
+
+            .content p {
+                margin-top: 25px;
+                font-size: 13px;
+            }
+
+            .content h1:before {
+                width: 50px;
+                bottom: -15px;
+            }
+        }
+
+        /* Animation d'apparition */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="logo">DÉLICES & SAVEURS</div>
+        <div class="burger-menu" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="menu.html">Notre Menu</a></li>
+            <li><a href="apropos.html">À Propos</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="front side">
+                <div class="content">
+                    <h1>Délices & Saveurs</h1>
+                    <p>Restaurant gastronomique où tradition et innovation se rencontrent pour créer des expériences culinaires inoubliables. Notre passion pour l'excellence se reflète dans chaque plat servi, préparé avec des ingrédients de saison et un savoir-faire artisanal.</p>
+                </div>
+            </div>
+            <div class="back side">
+                <div class="content">
+                    <h1>Contactez-nous</h1>
+                    <form id="contactForm">
+                        <label for="name">Votre nom :</label>
+                        <input type="text" id="name" name="name" placeholder="Jean Dupont" required>
+
+                        <label for="email">Votre e-mail :</label>
+                        <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
+
+                        <label for="message">Votre message :</label>
+                        <textarea id="message" name="message" placeholder="Décrivez votre demande de réservation..." required></textarea>
+
+                        <input type="submit" value="Envoyer">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Délices & Saveurs - Restaurant Gastronomique. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Burger Menu Toggle
+        const burger = document.getElementById('burger');
+        const navLinks = document.getElementById('navLinks');
+
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+        });
+
+        // Fermer le menu quand on clique sur un lien
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // Fermer le menu si on clique en dehors
+        document.addEventListener('click', (e) => {
+            const navbar = document.getElementById('navbar');
+            if (!navbar.contains(e.target) && navLinks.classList.contains('active')) {
+                burger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Gestion du formulaire - Redirection vers Gmail
+        const contactForm = document.getElementById('contactForm');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            // Construire l'URL mailto avec les paramètres
+            const subject = encodeURIComponent(`Réservation de ${name}`);
+            const body = encodeURIComponent(
+                `Nom: ${name}\n` +
+                `Email: ${email}\n\n` +
+                `Message:\n${message}`
+            );
+
+            // Ouvrir Gmail dans un nouvel onglet avec le message prérempli
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=contact@delices-saveurs.fr&su=${subject}&body=${body}`;
+            window.open(gmailUrl, '_blank');
+        });
+    </script>
+</body>
+</html>
