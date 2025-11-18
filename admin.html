@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Gastronomie</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Login Container */
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .login-container .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 48px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+            width: 100%;
+            max-width: 1400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 24px;
+        }
+
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .dashboard-header .user-email {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: #e8e8e8;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+        }
+
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+            cursor: move;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 12px;
+        }
+
+        .item-card h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .item-card .price {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .item-card .description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-card .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #45a049;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .btn-close:hover {
+            color: #333;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-upload {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-upload:hover {
+            background: #45a049;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #999;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #777;
+        }
+
+        .btn-save {
+            flex: 2;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #5568d3;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transition: bottom 0.3s ease;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            bottom: 20px;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .toast.error {
+            border-left: 4px solid #f44336;
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i {
+            color: #4CAF50;
+        }
+
+        .toast.error i {
+            color: #f44336;
+        }
+
+        .toast-message {
+            flex: 1;
+            color: #333;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Settings Form */
+        .settings-form {
+            max-width: 800px;
+        }
+
+        .settings-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-dashboard {
+                margin: 10px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: scroll;
+            }
+
+            .tab-content {
+                padding: 15px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="logo">
+            <i class="fas fa-utensils"></i>
+        </div>
+        <h1>Administration</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="admin@restaurant.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn" id="loginBtn">
+                Se connecter
+            </button>
+        </form>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Tableau de bord</h1>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="menu">
+                <i class="fas fa-utensils"></i> Menu
+            </button>
+            <button class="tab" data-tab="services">
+                <i class="fas fa-concierge-bell"></i> Services
+            </button>
+            <button class="tab" data-tab="apropos">
+                <i class="fas fa-info-circle"></i> À Propos
+            </button>
+            <button class="tab" data-tab="settings">
+                <i class="fas fa-cog"></i> Paramètres
+            </button>
+        </div>
+
+        <!-- Menu Tab -->
+        <div class="tab-content active" data-content="menu">
+            <div class="section-header">
+                <h2>Gestion du Menu</h2>
+                <button class="btn-add" id="addMenuBtn">
+                    <i class="fas fa-plus"></i> Ajouter un plat
+                </button>
+            </div>
+            <div class="items-grid" id="menuGrid">
+                <!-- Menu items will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Services Tab -->
+        <div class="tab-content" data-content="services">
+            <div class="section-header">
+                <h2>Gestion des Services</h2>
+                <button class="btn-add" id="addServiceBtn">
+                    <i class="fas fa-plus"></i> Ajouter un service
+                </button>
+            </div>
+            <div class="items-grid" id="servicesGrid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+
+        <!-- À Propos Tab -->
+        <div class="tab-content" data-content="apropos">
+            <div class="section-header">
+                <h2>Gestion des Slides À Propos</h2>
+            </div>
+            <div class="items-grid" id="aproposGrid">
+                <!-- Slides will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" data-content="settings">
+            <div class="section-header">
+                <h2>Paramètres Généraux</h2>
+            </div>
+            <form class="settings-form" id="settingsForm">
+                <div class="settings-section">
+                    <h3><i class="fas fa-image"></i> Section Hero</h3>
+                    <div class="form-row">
+                        <label for="heroTitre">Titre principal</label>
+                        <input type="text" id="heroTitre" name="heroTitre" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="heroSousTitre">Sous-titre</label>
+                        <textarea id="heroSousTitre" name="heroSousTitre" required></textarea>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-address-book"></i> Informations de contact</h3>
+                    <div class="form-row">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" name="contactEmail" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="contactTel">Téléphone</label>
+                        <input type="tel" id="contactTel" name="contactTel" required>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-font"></i> Logo & Branding</h3>
+                    <div class="form-row">
+                        <label for="logoText">Texte du logo</label>
+                        <input type="text" id="logoText" name="logoText" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-save" style="width: 100%; margin-top: 20px;">
+                    <i class="fas fa-save"></i> Enregistrer les paramètres
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Menu/Services/Apropos -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Ajouter un élément</h2>
+                <button class="btn-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemType">
+                <input type="hidden" id="currentPhotoURL">
+
+                <div class="form-row">
+                    <label for="itemTitre">Titre</label>
+                    <input type="text" id="itemTitre" required>
+                </div>
+
+                <div class="form-row" id="categorieRow" style="display: none;">
+                    <label for="itemCategorie">Catégorie</label>
+                    <select id="itemCategorie">
+                        <option value="entrees">Entrées</option>
+                        <option value="plats">Plats</option>
+                        <option value="desserts">Desserts</option>
+                    </select>
+                </div>
+
+                <div class="form-row" id="prixRow" style="display: none;">
+                    <label for="itemPrix">Prix</label>
+                    <input type="text" id="itemPrix" placeholder="18€">
+                </div>
+
+                <div class="form-row">
+                    <label for="itemDescription">Description</label>
+                    <textarea id="itemDescription" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label>Photo</label>
+                    <button type="button" class="btn-upload" id="uploadBtn">
+                        <i class="fas fa-cloud-upload-alt"></i> Télécharger une image
+                    </button>
+                    <img id="imagePreview" class="image-preview" style="display: none;">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="cancelBtn">Annuler</button>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <div class="toast-message" id="toastMessage"></div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+
+    <!-- Config & Logic -->
+    <script src="firebase-config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
